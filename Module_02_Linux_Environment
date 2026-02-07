@@ -1,0 +1,62 @@
+1.List all files larger than 1 MB in the current directory and save to a file
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ find . -maxdepth 1 -type f -size +1M > large_files.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ cat large_files.txt 
+./large2.txt
+./large1.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ ls -lh
+total 8.0M
+-rw-rw-r-- 1 rajesh rajesh  160 Feb  7 09:13 config.txt
+-rw-rw-r-- 1 rajesh rajesh 2.0M Feb  7 09:16 large1.txt
+-rw-rw-r-- 1 rajesh rajesh 5.0M Feb  7 09:16 large2.txt
+-rw-rw-r-- 1 rajesh rajesh   26 Feb  7 09:17 large_files.txt
+-rw-rw-r-- 1 rajesh rajesh 900K Feb  7 09:16 medium.txt
+-rw-rw-r-- 1 rajesh rajesh 100K Feb  7 09:16 small.txt
+
+2.Replace all occurrences of localhost with 127.0.0.1 and save as updated_config.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ cat updated_config.txt 
+# Sample Configuration File
+server = 127.0.0.1
+database_host = 127.0.0.1
+port = 3306
+api_url = http://127.0.0.1:8080
+log_path = /var/log/127.0.0.1
+timeout = 30
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ cat config.txt 
+# Sample Configuration File
+server = localhost
+database_host = localhost
+port = 3306
+api_url = http://localhost:8080
+log_path = /var/log/localhost
+timeout = 30
+
+3.Search lines containing ERROR but exclude DEBUG and save into filtered_log.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ cat log.txt
+INFO: Application started successfully.
+DEBUG: Initializing configuration loader.
+ERROR: Unable to connect to the database.
+ERROR: Failed to fetch data from API endpoint '/users'.
+DEBUG: Retrying database connection.
+ERROR: Missing required parameter in the request.
+ERROR: DEBUG mode enabled while processing request.
+INFO: Application shutdown complete.
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ grep "ERROR" log.txt | grep -v "DEBUG" > filtered_log.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ cat filtered_log.txt 
+ERROR: Unable to connect to the database.
+ERROR: Failed to fetch data from API endpoint '/users'.
+ERROR: Missing required parameter in the request.
+
+4.Identify the process with the highest memory usage and terminate it
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ ps -eo pid,comm,%mem --sort=-%mem | head -n 2
+    PID COMMAND         %MEM
+   3080 firefox         19.0
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ ps -eo pid,%mem --sort=-%mem | sed -n '2p' | awk '{print $1}' | xargs kill
+
+5.Print all available gateways in a sorted manner
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ ip route | grep via | awk '{print $3}' | sort -u
+10.0.2.2
+
+
+
+
+
