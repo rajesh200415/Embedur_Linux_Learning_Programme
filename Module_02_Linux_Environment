@@ -13,6 +13,7 @@ total 8.0M
 -rw-rw-r-- 1 rajesh rajesh 100K Feb  7 09:16 small.txt
 
 2.Replace all occurrences of localhost with 127.0.0.1 and save as updated_config.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ sed 's/localhost/127.0.0.1/g' config.txt > updated_config.txt
 rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/Module_02$ cat updated_config.txt 
 # Sample Configuration File
 server = 127.0.0.1
