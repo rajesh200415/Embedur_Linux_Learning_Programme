@@ -1,0 +1,131 @@
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/module_05$ cat file_analyser.sh 
+#!/bin/bash
+
+LOGFILE="errors.log"
+print_help() {
+cat << END
+File Analyzer Script
+Usage:
+  $0 -d <directory> -k <keyword>
+  $0 -f <file> -k <keyword>
+  $0 --help
+
+Options:
+  -d  Directory to search recursively
+  -f  File to search
+  -k  Keyword to search
+END
+}
+
+error_msg() {
+    echo "ERROR: $1" | tee -a "$LOGFILE" >&2
+}
+
+if [[ "$1" == "--help" ]]; then
+    print_help
+    exit 0
+fi
+
+while getopts ":d:f:k:" option
+do
+    case "$option" in
+        d) DIRECTORY="$OPTARG" ;;
+        f) FILE="$OPTARG" ;;
+        k) KEYWORD="$OPTARG" ;;
+        \?) error_msg "Invalid option -$OPTARG" ; exit 1 ;;
+        :)  error_msg "Option -$OPTARG requires argument" ; exit 1 ;;
+    esac
+done
+
+echo "Running Script : $0"
+echo "Arguments Count: $#"
+echo "Arguments List : $@"
+
+if [[ -z "$KEYWORD" || ! "$KEYWORD" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    error_msg "Keyword is empty or invalid"
+    exit 1
+fi
+
+recursive_search() {
+
+    for file in "$1"/*
+    do
+        if [[ -d "$file" ]]; then
+            recursive_search "$file"
+        elif [[ -f "$file" ]]; then
+            if grep -q "$KEYWORD" "$file" 2>/dev/null; then
+                echo "Match found in: $file"
+            fi
+        fi
+    done
+}
+
+file_search() {
+
+    data=$(cat "$1" 2>/dev/null)
+
+    if grep -q "$KEYWORD" <<< "$data"; then
+        echo "Keyword '$KEYWORD' found in $1"
+    else
+        echo "Keyword '$KEYWORD' not found in $1"
+    fi
+}
+
+if [[ -n "$DIRECTORY" && -n "$FILE" ]]; then
+    error_msg "Use either -d or -f, not both"
+    exit 1
+fi
+
+if [[ -n "$DIRECTORY" ]]; then
+
+    if [[ ! -d "$DIRECTORY" ]]; then
+        error_msg "Directory does not exist"
+        exit 1
+    fi
+
+    recursive_search "$DIRECTORY"
+
+elif [[ -n "$FILE" ]]; then
+
+    if [[ ! -f "$FILE" ]]; then
+        error_msg "File does not exist"
+        exit 1
+    fi
+
+    file_search "$FILE"
+
+else
+    error_msg "Please provide -d or -f option"
+    exit 1
+fi
+
+echo "Final Exit Status: $?"
+
+
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/module_05$ ls
+file_analyser.sh  logs  opttest.sh  sample.txt
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/module_05$ ./file_analyser.sh -d logs -k error
+Running Script : ./file_analyser.sh
+Arguments Count: 4
+Arguments List : -d logs -k error
+Match found in: logs/file1.txt
+Match found in: logs/sub2/file3.txt
+Final Exit Status: 0
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/module_05$ ./file_analyser.sh -f test.sh -k TODO
+Running Script : ./file_analyser.sh
+Arguments Count: 4
+Arguments List : -f test.sh -k TODO
+ERROR: File does not exist
+rajesh@ubuntu:~/Embedur_Linux_Learning_Programme/module_05$ ./file_analyser.sh --help
+File Analyzer Script
+
+Usage:
+  ./file_analyser.sh -d <directory> -k <keyword>
+  ./file_analyser.sh -f <file> -k <keyword>
+  ./file_analyser.sh --help
+
+Options:
+  -d  Directory to search recursively
+  -f  File to search
+  -k  Keyword to search
+
